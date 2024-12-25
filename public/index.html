@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Positive Statements</title>
+    <script defer>
+        document.addEventListener("DOMContentLoaded", () => {
+            const container = document.getElementById("input-container");
+            const saveButton = document.getElementById("save-button");
+            const counter = document.getElementById("counter");
+            let inputs = [];
+
+            function updateCounter() {
+                const filledInputs = inputs.filter(input => input.value.trim() !== "").length;
+                counter.textContent = `Filled Inputs: ${filledInputs}`;
+            }
+
+            function addInput() {
+                const input = document.createElement("input");
+                input.type = "text";
+                input.placeholder = "Write something positive...";
+                input.className = "dynamic-input";
+                input.addEventListener("input", () => {
+                    if (input.nextElementSibling === null) {
+                        addInput();
+                    }
+                    updateCounter();
+                });
+                inputs.push(input);
+                container.appendChild(input);
+            }
+
+            async function saveInputsToServer() {
+                const data = {
+                    inputs: inputs.map(input => input.value.trim()).filter(value => value !== ""),
+                    filledCount: inputs.filter(input => input.value.trim() !== "").length
+                };
+
+                try {
+                    const response = await fetch('/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (response.ok) {
+                        alert('Data saved successfully!');
+                    } else {
+                        alert('Failed to save data.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while saving data.');
+                }
+            }
+
+            addInput();
+            saveButton.addEventListener("click", saveInputsToServer);
+        });
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        #counter {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #input-container {
+            margin-bottom: 20px;
+        }
+
+        .dynamic-input {
+            display: block;
+            width: calc(100% - 20px);
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+        footer{
+            bottom: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>inControl</h1>
+    <div id="counter">Filled Inputs: 0</div>
+    <h1>Make as many positive statements about your friend as you can</h1>
+    <div id="input-container"></div>
+    <button id="save-button">Save</button>
+
+    <footer>Please, do not share this link with anyone, website is specific for each person.</footer>
+</body>
+</html>
